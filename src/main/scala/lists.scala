@@ -14,9 +14,9 @@ object P01 {
   }
 }
 
+
 // Find the last but one element of a list.
 object P02 {
-
   // List(t) matches to a list with 1 element
   def penultimateRec[A](l: List[A]): A = l match {
 //    case p :: h :: Nil => p
@@ -57,5 +57,105 @@ object P02 {
 
     assert(lastNthPro(3, List(1, 1, 2, 3, 5, 8)) == 3)
     assert(lastNthRec(3, List(1, 1, 2, 3, 5, 8)) == 3)
+    println("P02 passed")
   }
 }
+
+
+object P03 {
+
+  def nthPro[A](k: Int, l: List[A]): A = {
+    try l(k)
+    catch {
+      case e:IndexOutOfBoundsException => throw new NoSuchElementException
+    }
+  }
+
+  def nthRec1[A](n: Int, l: List[A]): A = (n,l) match {
+    case (0, h::_) => h
+    case (`n`, _::tail) if n > 0 => nthRec1(n - 1, tail)
+    case _ => throw new NoSuchElementException
+  }
+
+  def nthRec2[A](n: Int, l: List[A]): A = n match {
+    case 0 => l.head
+    case `n` if n > 0 => nthRec2(n - 1, l.tail)
+    case _ => throw new NoSuchElementException
+  }
+
+  def main(args: Array[String]): Unit = {
+    assert(nthPro(2, List(1, 1, 2, 3, 5, 8)) == 2)
+    assert(nthRec1(2, List(1, 1, 2, 3, 5, 8)) == 2)
+    assert(nthRec2(2, List(1, 1, 2, 3, 5, 8)) == 2)
+    println("P03 passed")
+  }
+
+}
+
+object P04 {
+  def lengthPro[A](l: List[A]): Int = l.length
+
+  def lengthRec[A](l: List[A]): Int = l match {
+    case Nil => 0
+    case _ :: tail => 1 + lengthRec(tail)
+  }
+
+  def lengthFold[A](l: List[A]): Int = l.foldLeft(0) { (c,_) => c + 1}
+
+  def main(args: Array[String]): Unit = {
+    assert(lengthPro(List(1, 1, 2, 3, 5, 8)) == 6)
+    assert(lengthRec(List(1, 1, 2, 3, 5, 8)) == 6)
+    assert(lengthFold(List(1, 1, 2, 3, 5, 8, 9)) == 7)
+    println("P04 passed")
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
