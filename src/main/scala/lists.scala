@@ -1,3 +1,5 @@
+import org.graalvm.compiler.lir.sparc.SPARCArithmetic.RemOp.Rem
+
 // Find the last element of a list.
 object P01 {
   def last[A](l: List[A]): A = l match {
@@ -137,7 +139,51 @@ object P05 {
   }
 }
 
+object flr {
+  def unapply[A] (l: List[A]) = l match {
+    case Nil => None
+    case l if (l.length == 1) => Some(l.head, List(), l.last)
+    case l => Some(l.head, l.init.tail, l.last)
+  }
+}
 
+object P06 {
+
+  // note that this one uses additional stack frames - but short circuits
+  def isPalindromeRec[A](l: List[A]): Boolean = l match {
+    case Nil => true
+    case List(_) => true
+    case list => list.head == list.last && isPalindromeRec(list.tail.init)
+  }
+
+  // this one does not use additional stack frames (tail recursive) - but must go through entire list
+  // to determine if it is a palindrome
+  def isPalindromeTailRec[A](l: List[A]): Boolean = {
+    def _isPalindromeTailRec(res: Boolean, rem: List[A]): Boolean = rem match {
+      case Nil => res
+      case List(a) => res
+      case list => _isPalindromeTailRec(res && rem.head == rem.last, rem.tail.init)
+    }
+    _isPalindromeTailRec(true, l)
+  }
+
+  def isPalindromeRec2[A](l: List[A]): Boolean = l match {
+    case Nil => true
+    case List(_) => true
+    case flr(first, rem, last) => (first == last) && isPalindromeRec2(rem)
+  }
+
+
+  def main(args: Array[String]): Unit = {
+    assert(isPalindromeRec(List(1, 2, 3, 2, 1)))
+    assert(!isPalindromeRec(List(1, 3, 3, 2, 1)))
+    assert(isPalindromeTailRec(List(1, 2, 3, 2, 1)))
+    assert(!isPalindromeTailRec(List(1, 3, 3, 2, 1)))
+    assert(isPalindromeRec2(List(1, 2, 3, 2, 1)))
+    assert(!isPalindromeRec2(List(1, 3, 3, 2, 1)))
+    println("P06 passed")
+  }
+}
 
 
 
