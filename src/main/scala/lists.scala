@@ -110,6 +110,37 @@ object P04 {
   }
 }
 
+object P05 {
+  def reversePro[A](l: List[A]): List[A] = l.reverse
+
+  def reverseRec[A](l: List[A]): List[A] = l match {
+    case h :: tail => reverseRec(tail) ::: List(h)
+    case Nil => Nil
+  }
+
+  def reverseTailRec[A](l: List[A]): List[A] = {
+    def _reverseTailRec(res: List[A], rem: List[A]): List[A] = rem match {
+      case Nil => res
+      case h :: tail => _reverseTailRec(h:: res, tail)
+    }
+    _reverseTailRec(Nil, l)
+  }
+
+  def reverseFold[A](l: List[A]): List[A] = l.foldLeft(List[A]()) { (res, h) => h :: res}
+
+  def main(args: Array[String]): Unit = {
+    val l = List(1, 1, 2, 3, 5, 8)
+    println(reversePro(l))
+    println(reverseRec(l))
+    println(reverseTailRec(l))
+    println(reverseFold(l))
+  }
+}
+
+
+
+
+
 
 
 
