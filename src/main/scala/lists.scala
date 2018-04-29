@@ -227,7 +227,53 @@ object P07 {
   }
 }
 
+object P08 {
+  def compressRec[A](l: List[A]): List[A] = l match {
+    case Nil => Nil
+    case h::List() => List(h)
+    case h::tail => if (h == tail.head) compressRec(tail) else h::compressRec(tail)
+  }
 
+  // I did this myself!
+  def compressTail[A](l: List[A]): List[A] = {
+    def _compressTail(res: List[A], rem: List[A]): List[A] = rem match {
+      case Nil => Nil
+      case h::List() => res:::List(h)
+      case h::tail if (h == tail.head) => _compressTail(res, tail)
+      case h::tail => _compressTail(res:::List(h), tail)
+    }
+    _compressTail(List(),l)
+  }
+
+
+  //  {
+  //    case (List(), e) => List(e)
+  //    case (ls, e) if (ls.last == e) => ls
+  //    case (ls, e) => ls:::List(e)
+  //  }
+  def compressFold[A](l: List[A]): List[A] = l.foldLeft(List[A]()) {
+    case (ls, e) if (ls.isEmpty || ls.last != e) => ls:::List(e)
+    case (ls, e) => ls
+  }
+
+  def compressRight[A](l: List[A]): List[A] = l.foldRight(List[A]()) {
+    case (e, ls) if ls.isEmpty => List(e)
+    case (e, ls) => if (ls.head != e) e::ls else ls
+  }
+
+  def compressRight2[A](l: List[A]): List[A] = l.foldRight(List[A]()) {
+    case (e, ls) if (ls.isEmpty || ls.head != e) => e::ls
+    case (e, ls) => ls
+  }
+
+  def main(args: Array[String]): Unit = {
+    println(compressRec(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+    println(compressTail(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+    println(compressFold(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+    println(compressRight(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+    println(compressRight2(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+  }
+}
 
 
 
