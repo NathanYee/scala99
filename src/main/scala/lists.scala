@@ -185,7 +185,47 @@ object P06 {
   }
 }
 
+object P07 {
 
+  // h:List[_] is a type pattern
+  // type of h will be checked in runtime against List[_]
+  // Since _ is a wild card, List[_] is a list of any type
+  //
+  // (h:List[_]) is a List, h, of any type
+  // keep calling flatten until h is no longer a list
+  //
+  // once h is a single element in a list, cons with the flattened tail
+  def flatten(l: List[Any]): List[Any] = l match {
+    case Nil => Nil
+    case (h:List[_])::tail => flatten(h):::flatten(tail)
+    case h::tail => h::flatten(tail)
+  }
+
+  // TODO: figure out what h:List[_] is doing and how it uses case (h:List[_])::tail
+  // might be Type ascription, https://stackoverflow.com/questions/2087250/what-is-the-purpose-of-type-ascriptions-in-scala
+  def flattenTail(l: List[Any]): List[Any] = {
+    def _flattenTail(res: List[Any], rem: List[Any]): List[Any] = rem match {
+      case Nil => res
+      case (h:List[_])::Nil => _flattenTail(res, h) // turns List(List()) into List()
+      case (h:List[_])::tail => _flattenTail(res:::h, tail)
+      case h::tail => _flattenTail(res:::List(h), tail)
+    }
+    _flattenTail(List(), l)
+  }
+
+  // using flatMap
+  def flatten2(l: List[Any]): List[Any] = l flatMap {
+    case ls: List[_] => flatten2(ls)
+    case h => List(h)
+  }
+
+  def main(args: Array[String]): Unit = {
+    println(flatten(List(List(1, 1), 2, List(3, List(5, 8)))))
+    println(flattenTail(List(List(1, 1), 2, List(3, List(List(5, 8))))))
+    println(flattenTail(List(List(1, 2, 3))))
+    println(flatten2(List(List(1, 2, 3))))
+  }
+}
 
 
 
