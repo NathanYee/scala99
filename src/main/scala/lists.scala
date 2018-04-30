@@ -3,9 +3,9 @@ import org.graalvm.compiler.lir.sparc.SPARCArithmetic.RemOp.Rem
 // Find the last element of a list.
 object P01 {
   def last[A](l: List[A]): A = l match {
-    case h :: Nil => h
+    case h :: Nil  => h
     case _ :: tail => last(tail)
-    case _ => throw new NoSuchElementException
+    case _         => throw new NoSuchElementException
   }
 
   def last2[A](l: List[A]): A = l.last
@@ -16,15 +16,14 @@ object P01 {
   }
 }
 
-
 // Find the last but one element of a list.
 object P02 {
   // List(t) matches to a list with 1 element
   def penultimateRec[A](l: List[A]): A = l match {
-//    case p :: h :: Nil => p
+    //    case p :: h :: Nil => p
     case h :: List(t) => h
-    case _ :: tail => penultimateRec(tail)
-    case _ => throw new NoSuchElementException
+    case _ :: tail    => penultimateRec(tail)
+    case _            => throw new NoSuchElementException
   }
 
   // init returns all elements except the last
@@ -43,9 +42,10 @@ object P02 {
 
   // you can use pattern guards to add if expressions (guards) to match case expressions
   def lastNthRec[A](n: Int, l: List[A]): A = l match {
-    case tail if tail.length == n => tail.head // tail is the whole list in this case
+    case tail if tail.length == n =>
+      tail.head // tail is the whole list in this case
     case _ :: tail => lastNthRec(n, tail)
-    case _ => throw new NoSuchElementException
+    case _         => throw new NoSuchElementException
   }
 
   def main(args: Array[String]): Unit = {
@@ -63,26 +63,25 @@ object P02 {
   }
 }
 
-
 object P03 {
 
   def nthPro[A](k: Int, l: List[A]): A = {
     try l(k)
     catch {
-      case e:IndexOutOfBoundsException => throw new NoSuchElementException
+      case e: IndexOutOfBoundsException => throw new NoSuchElementException
     }
   }
 
-  def nthRec1[A](n: Int, l: List[A]): A = (n,l) match {
-    case (0, h::_) => h
-    case (`n`, _::tail) if n > 0 => nthRec1(n - 1, tail)
-    case _ => throw new NoSuchElementException
+  def nthRec1[A](n: Int, l: List[A]): A = (n, l) match {
+    case (0, h :: _)               => h
+    case (`n`, _ :: tail) if n > 0 => nthRec1(n - 1, tail)
+    case _                         => throw new NoSuchElementException
   }
 
   def nthRec2[A](n: Int, l: List[A]): A = n match {
-    case 0 => l.head
+    case 0            => l.head
     case `n` if n > 0 => nthRec2(n - 1, l.tail)
-    case _ => throw new NoSuchElementException
+    case _            => throw new NoSuchElementException
   }
 
   def main(args: Array[String]): Unit = {
@@ -98,11 +97,13 @@ object P04 {
   def lengthPro[A](l: List[A]): Int = l.length
 
   def lengthRec[A](l: List[A]): Int = l match {
-    case Nil => 0
+    case Nil       => 0
     case _ :: tail => 1 + lengthRec(tail)
   }
 
-  def lengthFold[A](l: List[A]): Int = l.foldLeft(0) { (c,_) => c + 1}
+  def lengthFold[A](l: List[A]): Int = l.foldLeft(0) { (c, _) =>
+    c + 1
+  }
 
   def main(args: Array[String]): Unit = {
     assert(lengthPro(List(1, 1, 2, 3, 5, 8)) == 6)
@@ -117,18 +118,21 @@ object P05 {
 
   def reverseRec[A](l: List[A]): List[A] = l match {
     case h :: tail => reverseRec(tail) ::: List(h)
-    case Nil => Nil
+    case Nil       => Nil
   }
 
   def reverseTailRec[A](l: List[A]): List[A] = {
     def _reverseTailRec(res: List[A], rem: List[A]): List[A] = rem match {
-      case Nil => res
-      case h :: tail => _reverseTailRec(h:: res, tail)
+      case Nil       => res
+      case h :: tail => _reverseTailRec(h :: res, tail)
     }
+
     _reverseTailRec(Nil, l)
   }
 
-  def reverseFold[A](l: List[A]): List[A] = l.foldLeft(List[A]()) { (res, h) => h :: res}
+  def reverseFold[A](l: List[A]): List[A] = l.foldLeft(List[A]()) { (res, h) =>
+    h :: res
+  }
 
   def main(args: Array[String]): Unit = {
     val l = List(1, 1, 2, 3, 5, 8)
@@ -140,10 +144,10 @@ object P05 {
 }
 
 object flr {
-  def unapply[A] (l: List[A]) = l match {
-    case Nil => None
+  def unapply[A](l: List[A]) = l match {
+    case Nil                  => None
     case l if (l.length == 1) => Some(l.head, List(), l.last)
-    case l => Some(l.head, l.init.tail, l.last)
+    case l                    => Some(l.head, l.init.tail, l.last)
   }
 }
 
@@ -151,28 +155,29 @@ object P06 {
 
   // note that this one uses additional stack frames - but short circuits
   def isPalindromeRec[A](l: List[A]): Boolean = l match {
-    case Nil => true
+    case Nil     => true
     case List(_) => true
-    case list => list.head == list.last && isPalindromeRec(list.tail.init)
+    case list    => list.head == list.last && isPalindromeRec(list.tail.init)
   }
 
   // this one does not use additional stack frames (tail recursive) - but must go through entire list
   // to determine if it is a palindrome
   def isPalindromeTailRec[A](l: List[A]): Boolean = {
     def _isPalindromeTailRec(res: Boolean, rem: List[A]): Boolean = rem match {
-      case Nil => res
+      case Nil     => res
       case List(a) => res
-      case list => _isPalindromeTailRec(res && rem.head == rem.last, rem.tail.init)
+      case list =>
+        _isPalindromeTailRec(res && rem.head == rem.last, rem.tail.init)
     }
+
     _isPalindromeTailRec(true, l)
   }
 
   def isPalindromeRec2[A](l: List[A]): Boolean = l match {
-    case Nil => true
-    case List(_) => true
+    case Nil                   => true
+    case List(_)               => true
     case flr(first, rem, last) => (first == last) && isPalindromeRec2(rem)
   }
-
 
   def main(args: Array[String]): Unit = {
     assert(isPalindromeRec(List(1, 2, 3, 2, 1)))
@@ -196,9 +201,9 @@ object P07 {
   //
   // once h is a single element in a list, cons with the flattened tail
   def flatten(l: List[Any]): List[Any] = l match {
-    case Nil => Nil
-    case (h:List[_])::tail => flatten(h):::flatten(tail)
-    case h::tail => h::flatten(tail)
+    case Nil                  => Nil
+    case (h: List[_]) :: tail => flatten(h) ::: flatten(tail)
+    case h :: tail            => h :: flatten(tail)
   }
 
   // TODO: figure out what h:List[_] is doing and how it uses case (h:List[_])::tail
@@ -206,17 +211,19 @@ object P07 {
   def flattenTail(l: List[Any]): List[Any] = {
     def _flattenTail(res: List[Any], rem: List[Any]): List[Any] = rem match {
       case Nil => res
-      case (h:List[_])::Nil => _flattenTail(res, h) // turns List(List()) into List()
-      case (h:List[_])::tail => _flattenTail(res:::h, tail)
-      case h::tail => _flattenTail(res:::List(h), tail)
+      case (h: List[_]) :: Nil =>
+        _flattenTail(res, h) // turns List(List()) into List()
+      case (h: List[_]) :: tail => _flattenTail(res ::: h, tail)
+      case h :: tail            => _flattenTail(res ::: List(h), tail)
     }
+
     _flattenTail(List(), l)
   }
 
   // using flatMap
   def flatten2(l: List[Any]): List[Any] = l flatMap {
     case ls: List[_] => flatten2(ls)
-    case h => List(h)
+    case h           => List(h)
   }
 
   def main(args: Array[String]): Unit = {
@@ -229,22 +236,23 @@ object P07 {
 
 object P08 {
   def compressRec[A](l: List[A]): List[A] = l match {
-    case Nil => Nil
-    case h::List() => List(h)
-    case h::tail => if (h == tail.head) compressRec(tail) else h::compressRec(tail)
+    case Nil         => Nil
+    case h :: List() => List(h)
+    case h :: tail =>
+      if (h == tail.head) compressRec(tail) else h :: compressRec(tail)
   }
 
   // I did this myself!
   def compressTail[A](l: List[A]): List[A] = {
     def _compressTail(res: List[A], rem: List[A]): List[A] = rem match {
-      case Nil => Nil
-      case h::List() => res:::List(h)
-      case h::tail if (h == tail.head) => _compressTail(res, tail)
-      case h::tail => _compressTail(res:::List(h), tail)
+      case Nil                           => Nil
+      case h :: List()                   => res ::: List(h)
+      case h :: tail if (h == tail.head) => _compressTail(res, tail)
+      case h :: tail                     => _compressTail(res ::: List(h), tail)
     }
-    _compressTail(List(),l)
-  }
 
+    _compressTail(List(), l)
+  }
 
   //  {
   //    case (List(), e) => List(e)
@@ -252,73 +260,54 @@ object P08 {
   //    case (ls, e) => ls:::List(e)
   //  }
   def compressFold[A](l: List[A]): List[A] = l.foldLeft(List[A]()) {
-    case (ls, e) if (ls.isEmpty || ls.last != e) => ls:::List(e)
-    case (ls, e) => ls
+    case (ls, e) if (ls.isEmpty || ls.last != e) => ls ::: List(e)
+    case (ls, e)                                 => ls
   }
 
   def compressRight[A](l: List[A]): List[A] = l.foldRight(List[A]()) {
     case (e, ls) if ls.isEmpty => List(e)
-    case (e, ls) => if (ls.head != e) e::ls else ls
+    case (e, ls)               => if (ls.head != e) e :: ls else ls
   }
 
   def compressRight2[A](l: List[A]): List[A] = l.foldRight(List[A]()) {
-    case (e, ls) if (ls.isEmpty || ls.head != e) => e::ls
-    case (e, ls) => ls
+    case (e, ls) if (ls.isEmpty || ls.head != e) => e :: ls
+    case (e, ls)                                 => ls
   }
 
   def main(args: Array[String]): Unit = {
-    println(compressRec(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
-    println(compressTail(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
-    println(compressFold(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
-    println(compressRight(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
-    println(compressRight2(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+    println(
+      compressRec(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+    println(
+      compressTail(
+        List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+    println(
+      compressFold(
+        List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+    println(
+      compressRight(
+        List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+    println(
+      compressRight2(
+        List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
   }
 }
 
+object P09 {
+  // this is so cool!
+  def pack[A](l: List[A]): List[List[A]] = {
+    def _pack(res: List[List[A]], rem: List[A]): List[List[A]] = rem match {
+      case Nil => res
+      // create a new list for the non duplicate element
+      case h :: tail if (res.isEmpty || res.last.head != h) =>
+        _pack(res ::: List(List(h)), tail)
+      // if h is duplicate, join it with the last list and join that to the end other lists
+      case h :: tail => _pack(res.init ::: List(res.last ::: List(h)), tail)
+    }
 
+    _pack(List(), l)
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  def main(args: Array[String]): Unit = {
+    println(pack(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+  }
+}
