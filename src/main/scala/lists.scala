@@ -311,3 +311,23 @@ object P09 {
     println(pack(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
   }
 }
+
+object P10 {
+  def encode[A](l: List[A]):List[(Int, A)] = {
+    def _encode(res: List[(Int, A)], rem: List[List[A]]):List[(Int, A)] = rem match {
+      case Nil => res
+      case h::tail => _encode(res:::List((h.length, h.head)),tail)
+    }
+    _encode(List(), P09.pack(l))
+  }
+
+  def encodeMap[A](l: List[A]):List[(Int, A)] = {
+    P09.pack(l) map {e => (e.length, e.head)}
+  }
+
+  def main(args: Array[String]): Unit = {
+    println(encode(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+    println(encodeMap(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+  }
+}
+
