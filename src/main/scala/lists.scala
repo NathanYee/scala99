@@ -313,52 +313,94 @@ object P09 {
 }
 
 object P10 {
-  def encode[A](l: List[A]):List[(Int, A)] = {
-    def _encode(res: List[(Int, A)], rem: List[List[A]]):List[(Int, A)] = rem match {
-      case Nil => res
-      case h::tail => _encode(res:::List((h.length, h.head)),tail)
-    }
+  def encode[A](l: List[A]): List[(Int, A)] = {
+    def _encode(res: List[(Int, A)], rem: List[List[A]]): List[(Int, A)] =
+      rem match {
+        case Nil       => res
+        case h :: tail => _encode(res ::: List((h.length, h.head)), tail)
+      }
     _encode(List(), P09.pack(l))
   }
 
-  def encodeMap[A](l: List[A]):List[(Int, A)] = {
-    P09.pack(l) map {e => (e.length, e.head)}
+  def encodeMap[A](l: List[A]): List[(Int, A)] = {
+    P09.pack(l) map { e =>
+      (e.length, e.head)
+    }
   }
 
   def main(args: Array[String]): Unit = {
-    println(encode(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
-    println(encodeMap(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+    println(
+      encode(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+    println(
+      encodeMap(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
   }
 }
 
 object P11 {
-  def encodeModified[A](l: List[A]):List[Either[A, (Int, A)]] = {
+  def encodeModified[A](l: List[A]): List[Either[A, (Int, A)]] = {
     P09.pack(l) map {
       case e if e.length == 1 => Left(e.head)
-      case e => Right((e.length, e.head))
+      case e                  => Right((e.length, e.head))
     }
   }
 
-  def encodeUnsafe[A](l: List[A]):List[Any] = {
+  def encodeUnsafe[A](l: List[A]): List[Any] = {
     P09.pack(l) map {
       case e if e.length == 1 => e.head
-      case e => (e.length, e.head)
+      case e                  => (e.length, e.head)
     }
   }
 
   def main(args: Array[String]): Unit = {
-    println(encodeModified(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
-    println(encodeUnsafe(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+    println(
+      encodeModified(
+        List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+    println(
+      encodeUnsafe(
+        List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
   }
 }
 
 object P12 {
-  def decode[A](l: List[(Int, A)]):List[A] = {
-    
+  // my recursive solution!
+  def decode[A](l: List[(Int, A)]): List[A] = {
+    def _decode(res: List[A], rem: List[(Int, A)]): List[A] = rem match {
+      case Nil => res
+      case h :: tail =>
+        h match {
+          case (0, _) => _decode(res, tail)
+          case (n, h) => _decode(res ::: List(h), (n - 1, h) :: tail)
+        }
+    }
+    _decode(List(), l)
+  }
+
+  // using flatMap
+  def decodeFlatMap[A](l: List[(Int, A)]): List[A] = {
+    def _expand[A](res: List[A], rem: (Int, A)): List[A] = rem match {
+      case (0, _) => res
+      case (n, h) => _expand(res ::: List(h), (n - 1, h))
+    }
+    l flatMap { e =>
+      _expand(List(), e)
+    }
+  }
+
+  // using fill function
+  def decodeFill[A](l: List[(Int, A)]): List[A] = {
+    l flatMap { e => List.fill(e._1)(e._2)}
   }
 
   def main(args: Array[String]): Unit = {
-    println(decode(List((4, 'a), (1, 'b), (2, 'c), (2, 'a), (1, 'd), (4, 'e))))
-    assert(decode(List((4, 'a), (1, 'b), (2, 'c), (2, 'a), (1, 'd), (4, 'e))) == List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e))
+    val in = List((4, 'a), (1, 'b), (2, 'c), (2, 'a), (1, 'd), (4, 'e))
+    val out = List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)
+    println(decode(in))
+    assert(decode(in) == out)
+
+    println(decodeFlatMap(in))
+    assert(decodeFlatMap(in) == out)
+
+    println(decodeFill(in))
+    assert(decodeFill(in) == out)
   }
 }
