@@ -439,7 +439,9 @@ object P14 {
   }
 
   def duplicateFlatMap[A](l: List[A]): List[A] = {
-    l flatMap { e => List(e, e)}
+    l flatMap { e =>
+      List(e, e)
+    }
   }
 
   def main(args: Array[String]): Unit = {
@@ -451,5 +453,22 @@ object P14 {
 
     println(duplicateFlatMap(in))
     assert(duplicateFlatMap(in) == out)
+  }
+}
+
+object P15 {
+
+  def duplicateN[A](n: Int, l: List[A]): List[A] = {
+//    l flatMap { e => List.fill(n)(e) }
+    l flatMap { List.fill(n)(_) }
+  }
+
+  def main(args: Array[String]): Unit = {
+    val in = List('a, 'b, 'c, 'c, 'd)
+    val out = List('a, 'a, 'a, 'b, 'b, 'b, 'c, 'c, 'c, 'c, 'c, 'c, 'd, 'd, 'd)
+
+    println(duplicateN(3, in))
+    assert(duplicateN(3, in) == out)
+
   }
 }
