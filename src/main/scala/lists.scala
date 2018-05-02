@@ -404,3 +404,24 @@ object P12 {
     assert(decodeFill(in) == out)
   }
 }
+
+object P13 {
+  def encodeDirect[A](l: List[A]): List[(Int, A)] = {
+    def _encodeDirect(res: List[(Int, A)], rem: List[A]): List[(Int, A)] = rem match {
+      case Nil => res
+      case ls => {
+        val (s, r) = rem span { _ == rem.head}
+        _encodeDirect(res:::List((s.length, s.head)), r)
+      }
+    }
+    _encodeDirect(List(), l)
+  }
+
+  def main(args: Array[String]): Unit = {
+    val in = List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)
+    val out = List((4,'a), (1,'b), (2,'c), (2,'a), (1,'d), (4,'e))
+    println(encodeDirect(in))
+    assert(encodeDirect(in) == out)
+  }
+}
+
