@@ -331,3 +331,34 @@ object P10 {
   }
 }
 
+object P11 {
+  def encodeModified[A](l: List[A]):List[Either[A, (Int, A)]] = {
+    P09.pack(l) map {
+      case e if e.length == 1 => Left(e.head)
+      case e => Right((e.length, e.head))
+    }
+  }
+
+  def encodeUnsafe[A](l: List[A]):List[Any] = {
+    P09.pack(l) map {
+      case e if e.length == 1 => e.head
+      case e => (e.length, e.head)
+    }
+  }
+
+  def main(args: Array[String]): Unit = {
+    println(encodeModified(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+    println(encodeUnsafe(List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)))
+  }
+}
+
+object P12 {
+  def decode[A](l: List[(Int, A)]):List[A] = {
+    
+  }
+
+  def main(args: Array[String]): Unit = {
+    println(decode(List((4, 'a), (1, 'b), (2, 'c), (2, 'a), (1, 'd), (4, 'e))))
+    assert(decode(List((4, 'a), (1, 'b), (2, 'c), (2, 'a), (1, 'd), (4, 'e))) == List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e))
+  }
+}
