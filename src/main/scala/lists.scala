@@ -388,7 +388,9 @@ object P12 {
 
   // using fill function
   def decodeFill[A](l: List[(Int, A)]): List[A] = {
-    l flatMap { e => List.fill(e._1)(e._2)}
+    l flatMap { e =>
+      List.fill(e._1)(e._2)
+    }
   }
 
   def main(args: Array[String]): Unit = {
@@ -407,21 +409,47 @@ object P12 {
 
 object P13 {
   def encodeDirect[A](l: List[A]): List[(Int, A)] = {
-    def _encodeDirect(res: List[(Int, A)], rem: List[A]): List[(Int, A)] = rem match {
-      case Nil => res
-      case ls => {
-        val (s, r) = rem span { _ == rem.head}
-        _encodeDirect(res:::List((s.length, s.head)), r)
+    def _encodeDirect(res: List[(Int, A)], rem: List[A]): List[(Int, A)] =
+      rem match {
+        case Nil => res
+        case ls => {
+          val (s, r) = rem span { _ == rem.head }
+          _encodeDirect(res ::: List((s.length, s.head)), r)
+        }
       }
-    }
     _encodeDirect(List(), l)
   }
 
   def main(args: Array[String]): Unit = {
     val in = List('a, 'a, 'a, 'a, 'b, 'c, 'c, 'a, 'a, 'd, 'e, 'e, 'e, 'e)
-    val out = List((4,'a), (1,'b), (2,'c), (2,'a), (1,'d), (4,'e))
+    val out = List((4, 'a), (1, 'b), (2, 'c), (2, 'a), (1, 'd), (4, 'e))
     println(encodeDirect(in))
     assert(encodeDirect(in) == out)
   }
 }
 
+object P14 {
+
+  def duplicate[A](l: List[A]): List[A] = {
+    def _duplicate(res: List[A], rem: List[A]): List[A] = rem match {
+      case Nil       => res
+      case h :: tail => _duplicate(res ::: List(h, h), tail)
+    }
+    _duplicate(List(), l)
+  }
+
+  def duplicateFlatMap[A](l: List[A]): List[A] = {
+    l flatMap { e => List(e, e)}
+  }
+
+  def main(args: Array[String]): Unit = {
+    val in = List('a, 'b, 'c, 'c, 'd)
+    val out = List('a, 'a, 'b, 'b, 'c, 'c, 'c, 'c, 'd, 'd)
+
+    println(duplicate(in))
+    assert(duplicate(in) == out)
+
+    println(duplicateFlatMap(in))
+    assert(duplicateFlatMap(in) == out)
+  }
+}
